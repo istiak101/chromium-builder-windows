@@ -1,0 +1,3 @@
+[submodule "chromium-build-system"]
+	path = chromium-build-system
+	url = https://github.com/istiak101/chromium-build-system.git

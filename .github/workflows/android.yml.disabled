@@ -1,0 +1,34 @@
+name: android
+
+on: [push]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+          remove-docker-images: 'true'
+
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Test android build
+        run: |
+          sudo apt-get update
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          export PATH="$PATH:${{ github.workspace }}/depot_tools"
+          mkdir ~/chromium && cd ~/chromium
+          fetch --nohooks --no-history android
+          cd src && build/install-build-deps.sh --android
+          gclient runhooks
+          gn args out/Default
+          autoninja -C out/Default chrome_public_apk
